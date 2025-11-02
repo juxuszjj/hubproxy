@@ -44,13 +44,12 @@ jobs:
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           echo "REPO_LOWER=$REPO_LOWER" >> $GITHUB_ENV
 
-      - name: Build and push Docker image
+      - name: Pull and push Docker image
         run: |
-          docker push \
-            --platform linux/amd64,linux/arm64 \
-            --tag ghcr.io/${{ env.REPO_LOWER }}:${{ env.VERSION }} \
-            --tag ghcr.io/${{ env.REPO_LOWER }}:latest \
-            --build-arg VERSION=${{ env.VERSION }} \
-            -f Dockerfile .
+          docker pull ghcr.io/ylarod/ddk:${{ env.VERSION }}
+          docker tag ghcr.io/ylarod/ddk:${{ env.VERSION }} ghcr.io/${{ env.REPO_LOWER }}:${{ env.VERSION }}
+          docker tag ghcr.io/ylarod/ddk:${{ env.VERSION }} ghcr.io/${{ env.REPO_LOWER }}:latest
+          docker push ghcr.io/${{ env.REPO_LOWER }}:${{ env.VERSION }}
+          docker push ghcr.io/${{ env.REPO_LOWER }}:latest
         env:
           GHCR_PUBLIC: true  # 将镜像设置为公开
